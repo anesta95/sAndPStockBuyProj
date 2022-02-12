@@ -25,7 +25,7 @@ jobs:
           pipenv install
           
       - name: execute py script 
-        run: pipenv run python gainersLosers.py
+        run: pipenv run python sAndPCheck.py
         env: 
           SENDER_EMAIL: ${{ secrets.CLIENT_ID }}
           RECIPIENT_EMAIL: ${{ secrets.CLIENT_SECRET}}
