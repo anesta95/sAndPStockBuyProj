@@ -57,7 +57,7 @@ DoDCheck = DoD < -0.006561433645552261
 WoWCheck = WoW < -0.018166249525890653
 MoMCheck = MoM < -0.019372077488310015
 
-if (DoD & WoW & MoM):
+if (DoDCheck & WoWCheck & MoMCheck):
 
   # Create a secure SSL context
   context = ssl.create_default_context()
