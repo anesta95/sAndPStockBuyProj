@@ -14,7 +14,7 @@ smtp_server = "smtp.mail.yahoo.com"
 port = 465  
 sender_email = SENDER_EMAIL
 receiver_email = RECIPIENT_EMAIL
-password = PASSWORD
+password = EMAIL_PASSWORD
 sAndPSubjectText = 'Buy stocks'
 sAndPMessageText = '''
 ETFs:
