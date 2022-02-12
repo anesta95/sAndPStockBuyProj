@@ -27,8 +27,8 @@ jobs:
       - name: execute py script 
         run: pipenv run python sAndPCheck.py
         env: 
-          SENDER_EMAIL: ${{ secrets.CLIENT_ID }}
-          RECIPIENT_EMAIL: ${{ secrets.CLIENT_SECRET}}
+          SENDER_EMAIL: ${{ secrets.SENDER_EMAIL }}
+          RECIPIENT_EMAIL: ${{ secrets.RECIPIENT_EMAIL}}
           EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
         
           
