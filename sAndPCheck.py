@@ -53,13 +53,9 @@ n_rows = (len(sAndPLastMonth) - 1)
 
 MoM = (sAndPLastMonth.loc[1, 'Close'] - sAndPLastMonth.loc[n_rows, 'Close']) / sAndPLastMonth.loc[n_rows, 'Close']
 
-# DoD: < -0.006561433645552261
-# WoW: < -0.018166249525890653
-# MoM: < -0.019372077488310015
-
-DoD = True
-WoW = True
-MoM = True
+DoDCheck = DoD < -0.006561433645552261
+WoWCheck = WoW < -0.018166249525890653
+MoMCheck = MoM < -0.019372077488310015
 
 if ((DoD) & (WoW) & (MoM)):
 
