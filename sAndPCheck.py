@@ -57,7 +57,7 @@ DoDCheck = DoD < -0.006561433645552261
 WoWCheck = WoW < -0.018166249525890653
 MoMCheck = MoM < -0.019372077488310015
 
-if ((DoD) & (WoW) & (MoM)):
+if (DoD & WoW & MoM):
 
   # Create a secure SSL context
   context = ssl.create_default_context()
@@ -65,3 +65,20 @@ if ((DoD) & (WoW) & (MoM)):
   with smtplib.SMTP_SSL(smtp_server, port, context=context) as server:
       server.login(sender_email, password)
       server.sendmail(sender_email, receiver_email, message)
+
+
+# Research resources
+# Gmail API: https://developers.google.com/gmail/api/reference/rest & https://developers.google.com/gmail?hl=en 
+# Gmail API Python Quickstart: https://developers.google.com/gmail/api/quickstart/python
+# Gmail API Sending Emails: https://developers.google.com/gmail/api/guides/sending#python 
+
+# https://github.com/marketplace/actions/send-email
+# https://cloud.google.com/blog/products/identity-security/enabling-keyless-authentication-from-github-actions
+
+# Using SMTP (preffered)
+# https://realpython.com/python-send-email/
+# https://fulowa.medium.com/how-to-send-emails-using-python-and-github-actions-e3f09209044d
+# App password?
+# https://support.google.com/accounts/answer/185833?hl=en
+# https://spacejelly.dev/posts/how-to-schedule-daily-email-reports-with-github-actions-gmail-cron/
+# Use Yahoo!
