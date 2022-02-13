@@ -40,7 +40,7 @@ sAndPLastMonth = sAndP.history(period="1mo", interval="1d", prepost=False, actio
 
 sAndPLastMonth.reset_index(level=0, inplace=True)
 
-sAndPLastMonth = sAndPLastMonth.sort_values(by="Date", ascending=False)
+sAndPLastMonth = sAndPLastMonth.sort_values(by="Date", ascending=False).reset_index(drop=True)
 
 assert isinstance(sAndPLastMonth, pd.DataFrame)
 
@@ -52,6 +52,25 @@ WoW = (sAndPLastMonth.loc[1, 'Close'] - sAndPLastMonth.loc[5, 'Close']) / sAndPL
 n_rows = (len(sAndPLastMonth) - 1)
 
 MoM = (sAndPLastMonth.loc[1, 'Close'] - sAndPLastMonth.loc[n_rows, 'Close']) / sAndPLastMonth.loc[n_rows, 'Close']
+
+# Add to the total dataframe
+latestDate = sAndPLastMonth['Date'][0]
+latestValue = sAndPLastMonth['Close'][0]
+
+changesOverTimeList = [DoD, WoW, MoM]
+latestDateList = [latestDate] * 3
+latestValueList = [latestValue] * 3
+
+latestDict = {'Changes': changesOverTimeList, 
+'Change Value': ['DoD', 'WoW', 'MoM'], 'Close': latestValueList, 'Date': latestDateList}
+
+latestDF = pd.DataFrame(latestDict)
+
+histDF = pd.read_csv('sAndPHist.csv', parse_dates=['Date'])
+
+fullDF = histDF.append(latestDF)
+
+fullDF.to_csv('sAndPHist.csv', index=False)
 
 DoDCheck = DoD < -0.006561433645552261
 WoWCheck = WoW < -0.018166249525890653
