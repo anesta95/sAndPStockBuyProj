@@ -45,13 +45,13 @@ sAndPLastMonth = sAndPLastMonth.sort_values(by="Date", ascending=False).reset_in
 assert isinstance(sAndPLastMonth, pd.DataFrame)
 
 # Get day-over-day, week-over-week, and month-over-month change
-DoD = (sAndPLastMonth.loc[1, 'Close'] - sAndPLastMonth.loc[2, 'Close']) / sAndPLastMonth.loc[2, 'Close']
+DoD = (sAndPLastMonth.loc[0, 'Close'] - sAndPLastMonth.loc[1, 'Close']) / sAndPLastMonth.loc[1, 'Close']
 
-WoW = (sAndPLastMonth.loc[1, 'Close'] - sAndPLastMonth.loc[5, 'Close']) / sAndPLastMonth.loc[5, 'Close']
+WoW = (sAndPLastMonth.loc[0, 'Close'] - sAndPLastMonth.loc[5, 'Close']) / sAndPLastMonth.loc[5, 'Close']
 
 n_rows = (len(sAndPLastMonth) - 1)
 
-MoM = (sAndPLastMonth.loc[1, 'Close'] - sAndPLastMonth.loc[n_rows, 'Close']) / sAndPLastMonth.loc[n_rows, 'Close']
+MoM = (sAndPLastMonth.loc[0, 'Close'] - sAndPLastMonth.loc[n_rows, 'Close']) / sAndPLastMonth.loc[n_rows, 'Close']
 
 # Add to the total dataframe
 latestDate = sAndPLastMonth['Date'][0]
