@@ -68,7 +68,7 @@ latestDF = pd.DataFrame(latestDict)
 
 histDF = pd.read_csv('sAndPHist.csv', parse_dates=['Date'])
 
-fullDF = histDF.append(latestDF)
+fullDF = latestDF.append(histDF)
 
 fullDF.to_csv('sAndPHist.csv', index=False)
 
