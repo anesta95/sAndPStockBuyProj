@@ -137,59 +137,6 @@ for i in range(len(tickers)):
   checkStock(tickers[i], messages[i], dod_chgs[i], wow_chgs[i], mom_chgs[i], hist_files[i])
   time.sleep(3)
 
-# # S&P 500 yahoo finance data from yfinance
-# sAndP = yf.Ticker('^GSPC')
-
-# sAndPLastMonth = sAndP.history(period="1mo", interval="1d", prepost=False, actions=False, auto_adjust=True)
-
-# sAndPLastMonth.reset_index(level=0, inplace=True)
-
-# sAndPLastMonth = sAndPLastMonth.sort_values(by="Date", ascending=False).reset_index(drop=True)
-
-# assert isinstance(sAndPLastMonth, pd.DataFrame)
-
-# # Get day-over-day, week-over-week, and month-over-month change
-# DoD = (sAndPLastMonth.loc[0, 'Close'] - sAndPLastMonth.loc[1, 'Close']) / sAndPLastMonth.loc[1, 'Close']
-
-# WoW = (sAndPLastMonth.loc[0, 'Close'] - sAndPLastMonth.loc[5, 'Close']) / sAndPLastMonth.loc[5, 'Close']
-
-# n_rows = (len(sAndPLastMonth) - 1)
-
-# MoM = (sAndPLastMonth.loc[0, 'Close'] - sAndPLastMonth.loc[n_rows, 'Close']) / sAndPLastMonth.loc[n_rows, 'Close']
-
-# # Add to the total dataframe
-# latestDate = sAndPLastMonth['Date'][0]
-# latestValue = sAndPLastMonth['Close'][0]
-
-# changesOverTimeList = [DoD, WoW, MoM]
-# latestDateList = [latestDate] * 3
-# latestValueList = [latestValue] * 3
-
-# latestDict = {'Changes': changesOverTimeList, 
-# 'Change Value': ['DoD', 'WoW', 'MoM'], 'Close': latestValueList, 'Date': latestDateList}
-
-# latestDF = pd.DataFrame(latestDict)
-
-# histDF = pd.read_csv('sAndPHist.csv', parse_dates=['Date'])
-
-# fullDF = latestDF.append(histDF)
-
-# fullDF.to_csv('sAndPHist.csv', index=False)
-
-# DoDCheck = DoD < -0.006561433645552261
-# WoWCheck = WoW < -0.018166249525890653
-# MoMCheck = MoM < -0.020450491
-
-# if (DoDCheck & WoWCheck & MoMCheck):
-
-#   # Create a secure SSL context
-#   context = ssl.create_default_context()
-
-#   with smtplib.SMTP_SSL(smtp_server, port, context=context) as server:
-#       server.login(sender_email, password)
-#       server.sendmail(sender_email, receiver_email, message)
-
-
 # Research resources
 # Gmail API: https://developers.google.com/gmail/api/reference/rest & https://developers.google.com/gmail?hl=en 
 # Gmail API Python Quickstart: https://developers.google.com/gmail/api/quickstart/python
