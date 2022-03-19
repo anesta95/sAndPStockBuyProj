@@ -3,6 +3,7 @@ import yfinance as yf
 import os
 import smtplib
 import ssl
+import time
 
 
 SENDER_EMAIL = os.getenv('SENDER_EMAIL')
@@ -15,8 +16,13 @@ port = 465
 sender_email = SENDER_EMAIL
 receiver_email = RECIPIENT_EMAIL
 password = EMAIL_PASSWORD
-sAndPSubjectText = 'Buy stocks'
-sAndPMessageText = '''
+
+# Universal subject text
+subject_text = 'Buy stocks'
+
+# Index specific message text
+## S&P 500
+sandp_message_text = '''
 ETFs:
 Vanguard S&P 500 ETF: VOO
 iShares Core S&P ETF: IVV
@@ -28,62 +34,160 @@ Schwab S&P 500 Index Fund: SWPPX
 Fidelity 500 Index Fund: FXAIX
 Vanguard 500 Index Fund Admiral Shares: VFIAX
 State Street S&P 500 Index Fund Class N: SVSPX
-SPDR S&P 500 ETF: SPY
 '''
-message = 'Subject: {}\n\n{}'.format(sAndPSubjectText, sAndPMessageText)
+
+## Dow Jones
+dj_message_text = '''
+ETFs:
+SPDR Dow Jones Industrial Average ETF Trust: DIA
+Schwab US Broad Market ETF: SCHB 
+'''
+
+## NASDAQ
+nasdaq_message_text = '''
+ETFs:
+Invesco Nasdaq 100 ETF: QQQM
+Invesco QQQ: QQQ
+'''
+
+### Russell
+russell_message_text = '''
+ETFs:
+Vanguard's Russell 2000 ETF: VTWO
+Direxion Daily Small Cap Bull 3x Shares: TNA
+BlackRock's iShares Russell 2000 ETF: IWM
+'''
+
+sandp_message = 'Subject: {}\n\n{}'.format(subject_text, sandp_message_text)
+dj_message = 'Subject: {}\n\n{}'.format(subject_text, dj_message_text)
+nasdaq_message = 'Subject: {}\n\n{}'.format(subject_text, nasdaq_message_text)
+russell_message = 'Subject: {}\n\n{}'.format(subject_text, russell_message_text)
+
+messages = [sandp_message, dj_message, nasdaq_message, russell_message]
+
+tickers = ['^GSPC', '^DJI', '^IXIC', '^RUT']
+
+hist_files = ['sandp_hist.csv', 'dowjones_hist.csv', 'nasdaq_hist.csv', 'russell_hist.csv']
+
+dod_chgs = [-0.006561434, -0.007362399, -0.006262419, -0.007877505]
+wow_chgs = [-0.018166250, -0.018581559, -0.018531164, -0.021888146]
+mom_chgs = [-0.020450491, -0.018030812, -0.021881666, -0.026743648]
 
 
-# S&P 500 yahoo finance data from yfinance
-sAndP = yf.Ticker('^GSPC')
+def checkStock(stock_ticker, message_text, dod_chg, wow_chg, mom_chg, hist_file):
+  # Download ticker data from yfinance
 
-sAndPLastMonth = sAndP.history(period="1mo", interval="1d", prepost=False, actions=False, auto_adjust=True)
+  index_data = yf.Ticker(stock_ticker)
 
-sAndPLastMonth.reset_index(level=0, inplace=True)
+  index_data_last_month = index_data.history(period="1mo", interval="1d", prepost=False, actions=False, auto_adjust=True)
 
-sAndPLastMonth = sAndPLastMonth.sort_values(by="Date", ascending=False).reset_index(drop=True)
+  index_data_last_month.reset_index(level=0, inplace=True)
 
-assert isinstance(sAndPLastMonth, pd.DataFrame)
+  index_data_last_month = index_data_last_month.sort_values(by="Date", ascending=False).reset_index(drop=True)
 
-# Get day-over-day, week-over-week, and month-over-month change
-DoD = (sAndPLastMonth.loc[0, 'Close'] - sAndPLastMonth.loc[1, 'Close']) / sAndPLastMonth.loc[1, 'Close']
+  assert isinstance(index_data_last_month, pd.DataFrame)
 
-WoW = (sAndPLastMonth.loc[0, 'Close'] - sAndPLastMonth.loc[5, 'Close']) / sAndPLastMonth.loc[5, 'Close']
+  # Get day-over-day, week-over-week, and month-over-month change
+  DoD = (index_data_last_month.loc[0, 'Close'] - index_data_last_month.loc[1, 'Close']) / index_data_last_month.loc[1, 'Close']
 
-n_rows = (len(sAndPLastMonth) - 1)
+  WoW = (index_data_last_month.loc[0, 'Close'] - index_data_last_month.loc[5, 'Close']) / index_data_last_month.loc[5, 'Close']
 
-MoM = (sAndPLastMonth.loc[0, 'Close'] - sAndPLastMonth.loc[n_rows, 'Close']) / sAndPLastMonth.loc[n_rows, 'Close']
+  n_rows = (len(index_data_last_month) - 1)
 
-# Add to the total dataframe
-latestDate = sAndPLastMonth['Date'][0]
-latestValue = sAndPLastMonth['Close'][0]
+  MoM = (index_data_last_month.loc[0, 'Close'] - index_data_last_month.loc[n_rows, 'Close']) / index_data_last_month.loc[n_rows, 'Close']
 
-changesOverTimeList = [DoD, WoW, MoM]
-latestDateList = [latestDate] * 3
-latestValueList = [latestValue] * 3
+  # Add to the total dataframe
+  latest_date = index_data_last_month['Date'][0]
+  latest_values = index_data_last_month['Close'][0]
 
-latestDict = {'Changes': changesOverTimeList, 
-'Change Value': ['DoD', 'WoW', 'MoM'], 'Close': latestValueList, 'Date': latestDateList}
+  changes_over_time_list = [DoD, WoW, MoM]
+  latest_date_list = [latest_date] * 3
+  latest_value_list = [latest_values] * 3
 
-latestDF = pd.DataFrame(latestDict)
+  latest_dict = {'Changes': changes_over_time_list, 
+  'Change Value': ['DoD', 'WoW', 'MoM'], 'Close': latest_value_list, 'Date': latest_date_list}
 
-histDF = pd.read_csv('sAndPHist.csv', parse_dates=['Date'])
+  latest_DF = pd.DataFrame(latest_dict)
 
-fullDF = latestDF.append(histDF)
+  hist_DF = pd.read_csv(hist_file, parse_dates=['Date'])
 
-fullDF.to_csv('sAndPHist.csv', index=False)
+  full_DF = latest_DF.append(hist_DF)
 
-DoDCheck = DoD < -0.006561433645552261
-WoWCheck = WoW < -0.018166249525890653
-MoMCheck = MoM < -0.019372077488310015
+  full_DF.to_csv(hist_file, index=False)
 
-if (DoDCheck & WoWCheck & MoMCheck):
+  DoD_check = DoD < dod_chg
+  WoW_check = WoW < wow_chg
+  MoM_check = MoM < mom_chg
 
-  # Create a secure SSL context
-  context = ssl.create_default_context()
+  if (DoD_check & WoW_check & MoM_check):
 
-  with smtplib.SMTP_SSL(smtp_server, port, context=context) as server:
-      server.login(sender_email, password)
-      server.sendmail(sender_email, receiver_email, message)
+    # Create a secure SSL context
+    context = ssl.create_default_context()
+
+    with smtplib.SMTP_SSL(smtp_server, port, context=context) as server:
+        server.login(sender_email, password)
+        server.sendmail(sender_email, receiver_email, message)
+    
+    print(f"Email sent for {stock_ticker}")
+  else:
+    print(f"No email needed for {stock_ticker}")
+
+
+for i in range(len(tickers)):
+  checkStock(tickers[i], messages[i], dod_chgs[i], wow_chgs[i], mom_chgs[i], hist_files[i])
+  time.sleep(3)
+
+# # S&P 500 yahoo finance data from yfinance
+# sAndP = yf.Ticker('^GSPC')
+
+# sAndPLastMonth = sAndP.history(period="1mo", interval="1d", prepost=False, actions=False, auto_adjust=True)
+
+# sAndPLastMonth.reset_index(level=0, inplace=True)
+
+# sAndPLastMonth = sAndPLastMonth.sort_values(by="Date", ascending=False).reset_index(drop=True)
+
+# assert isinstance(sAndPLastMonth, pd.DataFrame)
+
+# # Get day-over-day, week-over-week, and month-over-month change
+# DoD = (sAndPLastMonth.loc[0, 'Close'] - sAndPLastMonth.loc[1, 'Close']) / sAndPLastMonth.loc[1, 'Close']
+
+# WoW = (sAndPLastMonth.loc[0, 'Close'] - sAndPLastMonth.loc[5, 'Close']) / sAndPLastMonth.loc[5, 'Close']
+
+# n_rows = (len(sAndPLastMonth) - 1)
+
+# MoM = (sAndPLastMonth.loc[0, 'Close'] - sAndPLastMonth.loc[n_rows, 'Close']) / sAndPLastMonth.loc[n_rows, 'Close']
+
+# # Add to the total dataframe
+# latestDate = sAndPLastMonth['Date'][0]
+# latestValue = sAndPLastMonth['Close'][0]
+
+# changesOverTimeList = [DoD, WoW, MoM]
+# latestDateList = [latestDate] * 3
+# latestValueList = [latestValue] * 3
+
+# latestDict = {'Changes': changesOverTimeList, 
+# 'Change Value': ['DoD', 'WoW', 'MoM'], 'Close': latestValueList, 'Date': latestDateList}
+
+# latestDF = pd.DataFrame(latestDict)
+
+# histDF = pd.read_csv('sAndPHist.csv', parse_dates=['Date'])
+
+# fullDF = latestDF.append(histDF)
+
+# fullDF.to_csv('sAndPHist.csv', index=False)
+
+# DoDCheck = DoD < -0.006561433645552261
+# WoWCheck = WoW < -0.018166249525890653
+# MoMCheck = MoM < -0.020450491
+
+# if (DoDCheck & WoWCheck & MoMCheck):
+
+#   # Create a secure SSL context
+#   context = ssl.create_default_context()
+
+#   with smtplib.SMTP_SSL(smtp_server, port, context=context) as server:
+#       server.login(sender_email, password)
+#       server.sendmail(sender_email, receiver_email, message)
 
 
 # Research resources
