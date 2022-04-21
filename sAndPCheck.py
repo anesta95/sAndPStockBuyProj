@@ -126,7 +126,7 @@ def checkStock(stock_ticker, message_text, dod_chg, wow_chg, mom_chg, hist_file)
 
     with smtplib.SMTP_SSL(smtp_server, port, context=context) as server:
         server.login(sender_email, password)
-        server.sendmail(sender_email, receiver_email, message)
+        server.sendmail(sender_email, receiver_email, message_text)
     
     print(f"Email sent for {stock_ticker}")
   else:
