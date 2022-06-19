@@ -111,7 +111,7 @@ def checkStock(stock_ticker, message_text, dod_chg, wow_chg, mom_chg, hist_file)
 
   hist_DF = pd.read_csv(hist_file, parse_dates=['Date'])
 
-  full_DF = latest_DF.append(hist_DF)
+  full_DF = pd.concat([latest_DF, hist_DF])
 
   full_DF.to_csv(hist_file, index=False)
 
