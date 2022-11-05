@@ -69,9 +69,9 @@ tickers = ['^GSPC', '^DJI', '^IXIC', '^RUT']
 
 hist_files = ['sandp_hist.csv', 'dowjones_hist.csv', 'nasdaq_hist.csv', 'russell_hist.csv']
 
-dod_chgs = [-0.008686827, -0.009725704, -0.01038255, -0.01278698]
-wow_chgs = [-0.023812954, -0.023145163, -0.02704155, -0.03113184]
-mom_chgs = [-0.030306497, -0.025150537, -0.04117135, -0.04521575]
+dod_chgs = [-0.01147873, -0.01548024, -0.01421591, -0.02035182]
+wow_chgs = [-0.03177592, -0.03197264, -0.04213725, -0.04555398]
+mom_chgs = [-0.04931180, -0.05204150, -0.08436092, -0.08876828]
 
 
 def checkStock(stock_ticker, message_text, dod_chg, wow_chg, mom_chg, hist_file):
