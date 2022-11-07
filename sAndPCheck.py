@@ -17,8 +17,8 @@ sender_email = SENDER_EMAIL
 receiver_email = RECIPIENT_EMAIL
 password = EMAIL_PASSWORD
 
-# Universal subject text
-subject_text = 'Buy stocks'
+# Subject lines text
+subject_text = 'Buy or Sell stocks'
 
 # Index specific message text
 ## S&P 500
@@ -63,18 +63,22 @@ dj_message = 'Subject: {}\n\n{}'.format(subject_text, dj_message_text)
 nasdaq_message = 'Subject: {}\n\n{}'.format(subject_text, nasdaq_message_text)
 russell_message = 'Subject: {}\n\n{}'.format(subject_text, russell_message_text)
 
-messages = [sandp_message, dj_message, nasdaq_message, russell_message]
+messages = [sandp_message_loss, dj_message_loss, nasdaq_message_loss, russell_message_loss]
 
 tickers = ['^GSPC', '^DJI', '^IXIC', '^RUT']
 
 hist_files = ['sandp_hist.csv', 'dowjones_hist.csv', 'nasdaq_hist.csv', 'russell_hist.csv']
 
-dod_chgs = [-0.01147873, -0.01548024, -0.01421591, -0.02035182]
-wow_chgs = [-0.03177592, -0.03197264, -0.04213725, -0.04555398]
-mom_chgs = [-0.04931180, -0.05204150, -0.08436092, -0.08876828]
+dod_chgs_loss = [-0.01147873, -0.01548024, -0.01421591, -0.02035182]
+wow_chgs_loss = [-0.03177592, -0.03197264, -0.04213725, -0.04555398]
+mom_chgs_loss = [-0.04931180, -0.05204150, -0.08436092, -0.08876828]
+
+dod_chgs_gain = [0.006793501, 0.005650722, 0.006119077, 0.004868226]
+wow_chgs_gain = [0.023496256, 0.014506593, 0.022056676, 0.024617206]
+mom_chgs_gain = [0.049507707, 0.048641329, 0.052482625, 0.055777122]
 
 
-def checkStock(stock_ticker, message_text, dod_chg, wow_chg, mom_chg, hist_file):
+def checkStock(stock_ticker, message_text, dod_chg_loss, dod_chg_gain, wow_chg_loss, wow_chg_gain, mom_chg_loss, mom_chg_gain, hist_file):
   # Download ticker data from yfinance
 
   index_data = yf.Ticker(stock_ticker)
@@ -115,9 +119,9 @@ def checkStock(stock_ticker, message_text, dod_chg, wow_chg, mom_chg, hist_file)
 
   full_DF.to_csv(hist_file, index=False)
 
-  DoD_check = DoD < dod_chg
-  WoW_check = WoW < wow_chg
-  MoM_check = MoM < mom_chg
+  DoD_check = (DoD < dod_chg_loss) | (DoD > dod_chg_gain)
+  WoW_check = (WoW < wow_chg_loss) | (WoW > wow_chg_gain)
+  MoM_check = (MoM < mom_chg_loss) | (MoM > mom_chg_gain)
 
   if (DoD_check & WoW_check & MoM_check):
 
@@ -134,7 +138,7 @@ def checkStock(stock_ticker, message_text, dod_chg, wow_chg, mom_chg, hist_file)
 
 
 for i in range(len(tickers)):
-  checkStock(tickers[i], messages[i], dod_chgs[i], wow_chgs[i], mom_chgs[i], hist_files[i])
+  checkStock(tickers[i], messages[i], dod_chgs_loss[i], dod_chgs_gain[i], wow_chgs_loss[i], wow_chgs_gain[i], mom_chgs_loss[i], mom_chgs_gain[i], hist_files[i])
   time.sleep(3)
 
 # Research resources
