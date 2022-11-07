@@ -3,7 +3,7 @@ name: sAndP-check-yahoo-finance
 on:
   workflow_dispatch:
   schedule:
-    - cron: '37 21 * * 1-5' # runs once every weekday at 4:37 pm EST (after market close)
+    - cron: '37 22 * * 1-5' # runs once every weekday at 4:37 pm EST (after market close)
 
 jobs:
   build:
