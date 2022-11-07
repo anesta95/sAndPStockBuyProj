@@ -63,7 +63,7 @@ dj_message = 'Subject: {}\n\n{}'.format(subject_text, dj_message_text)
 nasdaq_message = 'Subject: {}\n\n{}'.format(subject_text, nasdaq_message_text)
 russell_message = 'Subject: {}\n\n{}'.format(subject_text, russell_message_text)
 
-messages = [sandp_message_loss, dj_message_loss, nasdaq_message_loss, russell_message_loss]
+messages = [sandp_message, dj_message, nasdaq_message, russell_message]
 
 tickers = ['^GSPC', '^DJI', '^IXIC', '^RUT']
 
